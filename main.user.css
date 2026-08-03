@@ -1,0 +1,581 @@
+/* ==UserStyle==
+@name           Gmail 2015 — Kennedy-era restoration
+@namespace      local.burke
+@version        1.6.0
+@description    Rolls modern Gmail back to its ~2015 chrome: red COMPOSE, gray gradient buttons, Arial 13px, square corners, #f2f2f2 read rows, blue search button, red selected labels, Catull-style red wordmark.
+@author         Burke
+==/UserStyle== */
+
+@-moz-document domain("mail.google.com") {
+
+/* =========================================================================
+   NOTES ON SELECTOR STABILITY
+   Gmail's obfuscated GWT-era class names (.zA, .T-I, .aeN, .TO, .yO/.zE,
+   .hP, .aoO ...) have been stable for well over a decade and are safe bets.
+   Anything marked [FRAGILE] uses aria-labels (English UI assumed) or newer
+   Material-era classes and may need a DevTools touch-up after a Gmail push.
+   Each section is independent — if one rule dies, the rest keep working.
+   ========================================================================= */
+
+/* ------------------------------------------------------------------ */
+/* 1. Foundation: Arial 13px, kill the 2020s roundness                */
+/* ------------------------------------------------------------------ */
+
+body,
+.nH, .aeN, .TN, .nU, .aio, .bsU,
+.zA span, .yW, .yP, .zF, .bog, .y2, .xW span,
+.T-I, .hP, .gD, .go, .g3, .ar9 {
+    font-family: Arial, Helvetica, sans-serif !important;
+}
+
+.T-I,
+[role="button"],
+.G-Ni,
+#gb [role="button"],
+#gb a img {
+    border-radius: 2px !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* 2. Header bar (#gb): flat white, red wordmark, no Gemini           */
+/* ------------------------------------------------------------------ */
+
+#gb,
+header[role="banner"] {
+    background: #fff !important;
+    box-shadow: none !important;
+    border-bottom: 1px solid #e5e5e5 !important;
+}
+
+/* Hide the multicolor-M lockup ... */
+#gb img[src*="logo_gmail"],
+#gb img[alt="Gmail"],
+#gb [style*="logo_gmail"] {
+    display: none !important;
+}
+
+/* ... and draw the four-color serif "Google" in its place — your
+   reference shows the One Google bar layout: Google logo top-left,
+   with the red "Gmail ▾" service switcher moved down into the nav
+   column (added below via .aeN::before). Inline SVG data-URI so
+   nothing depends on Google still hosting 2013 assets. Alternatives:
+     - the real 2013 asset, if it still resolves and Gmail's CSP
+       allows it — swap the background line for:
+       background: url("https://www.google.com/images/srpr/logo11w.png") left center / contain no-repeat;
+     - or your own capture as a data: URI, same pattern. */
+#gb a:has(> img[alt="Gmail"])::after,
+#gb a:has(img[src*="logo_gmail"])::after {
+    content: "";
+    display: inline-block;
+    width: 92px;
+    height: 32px;
+    background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='92' height='32'%3E%3Ctext x='0' y='25' font-family='Georgia,serif' font-size='27' letter-spacing='-1.5'%3E%3Ctspan fill='%234285f4'%3EG%3C/tspan%3E%3Ctspan fill='%23ea4335'%3Eo%3C/tspan%3E%3Ctspan fill='%23fbbc05'%3Eo%3C/tspan%3E%3Ctspan fill='%234285f4'%3Eg%3C/tspan%3E%3Ctspan fill='%2334a853'%3El%3C/tspan%3E%3Ctspan fill='%23ea4335'%3Ee%3C/tspan%3E%3C/text%3E%3C/svg%3E") left center / contain no-repeat;
+}
+
+/* 2015 had no hamburger — the nav was always open. Hiding it also
+   removes your only way to un-collapse the nav, so it ships off:
+#gb [aria-label="Main menu"] { display: none !important; }            */
+
+/* No sparkles in 2015 — every Gemini/AI entry point I can hook. Both
+   this and the Upgrade pill outlived the v1.1 #gb-scoped rules while
+   the logo rule worked, which means they're either mounted outside
+   #gb or carry none of those attributes — so these are now unscoped,
+   but limited to interactive elements (and to imgs outside message
+   bodies, .a3s) so mail content stays safe.
+   [FRAGILE — attribute text, English UI] */
+:is(a, button, [role="button"])[aria-label*="emini" i],
+:is(a, button, [role="button"])[title*="emini" i],
+[data-tooltip*="emini" i],
+img[src*="gemini" i]:not(.a3s img),
+img[src*="sparkle" i]:not(.a3s img),
+img[src*="bard" i]:not(.a3s img),
+:is(a, button, [role="button"]):has(img[src*="gemini" i]):not(.a3s *),
+:is(a, button, [role="button"]):has(img[src*="sparkle" i]):not(.a3s *),
+:is(a, button, [role="button"]):has(svg[class*="gemini" i]),
+[aria-label*="Ask Gemini" i],
+[data-tooltip*="Ask Gemini" i],
+[aria-label*="Help me write" i],
+[aria-label*="Summarize this email" i],
+/* v1.3: bare matches on ANY element (v1.2's :is(a,button,[role])
+   restriction missed role-less divs), guarded so message bodies
+   (.a3s) and list rows (.zA) can't be collateral */
+[aria-label*="emini" i]:not(.a3s *):not(.zA *),
+[title*="emini" i]:not(.a3s *):not(.zA *),
+/* v1.3: Google's own promo-placement attributes, lifted from
+   AdGuard's annoyance list — they hide exactly these on
+   mail.google.com. "pep" = promotional entry point, "gemkick" =
+   the Gemini kicker icon's callout. No peps existed in 2015. */
+div[data-pep-id],
+[data-rp-placement-id*="pep" i],
+[data-rp-placement-id*="gemkick" i] {
+    display: none !important;
+}
+
+/* No upsells in 2015: the Google One "Upgrade" pill — unscoped for
+   the same reason. If it's a pep chip, the data-pep-id rule above
+   already got it; these cover the anchor variants. */
+a[href*="one.google.com"],
+a[href*="workspace.google.com/individual"],
+header[role="banner"] a[href*="/upgrade" i],
+:is(a, button, [role="button"])[aria-label*="pgrade" i],
+:is(a, button, [role="button"]):has(> [aria-label*="pgrade" i]) {
+    display: none !important;
+}
+
+/* The settings gear, 2014 spec: a Kennedy gray button with a ▾, seated
+   at the toolbar's right edge instead of the header. Teleporting across
+   containers means position:fixed — if the vertical seat is off with
+   your window chrome, tune top: by a few px. Delete the three position
+   lines to keep it in the header, Kennedy-styled.
+   [FRAGILE — aria-label/data-tooltip, English UI] */
+header [aria-label="Settings"]:not(:has([aria-label="Settings"])),
+#gb [aria-label="Settings"]:not(:has([aria-label="Settings"])),
+[data-tooltip="Settings"]:not(:has([aria-label="Settings"])) {
+    position: fixed !important;
+    top: 62px !important;
+    right: 8px !important;
+    z-index: 999 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 46px !important;
+    height: 27px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #f5f5f5 linear-gradient(#f5f5f5, #f1f1f1) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 2px !important;
+    box-shadow: none !important;
+}
+
+/* v1.6: Google nests a labeled wrapper around the labeled button, so
+   both matched and the wrapper rendered as that oversized gray slab —
+   outer matches get neutralized; only the innermost is the button */
+:is(header, #gb) [aria-label="Settings"]:has([aria-label="Settings"]),
+[data-tooltip="Settings"]:has([aria-label="Settings"]) {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* ...and the gear glyph stays at 2014 scale */
+header [aria-label="Settings"] :is(svg, img),
+#gb [aria-label="Settings"] :is(svg, img),
+[data-tooltip="Settings"] :is(svg, img) {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+header [aria-label="Settings"]:hover,
+#gb [aria-label="Settings"]:hover,
+[data-tooltip="Settings"]:hover {
+    border-color: #c6c6c6 !important;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) !important;
+}
+
+header [aria-label="Settings"]:not(:has([aria-label="Settings"]))::after,
+#gb [aria-label="Settings"]:not(:has([aria-label="Settings"]))::after,
+[data-tooltip="Settings"]:not(:has([aria-label="Settings"]))::after {
+    content: "▾";
+    font-size: 9px;
+    color: #666;
+    margin-left: 3px;
+}
+
+/* Clear the toolbar's right corner so the gear has its 2014 seat —
+   this is the input-tools picker; delete to get it back */
+[data-tooltip*="input tool" i],
+[aria-label*="input tool" i] {
+    display: none !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* 3. Search: square white input + Kennedy-blue button on the right   */
+/* ------------------------------------------------------------------ */
+
+/* [FRAGILE-ish: #aso_search_form_anchor has held for years] */
+#aso_search_form_anchor {
+    position: relative !important;
+    background: #fff !important;
+    border: 1px solid #d9d9d9 !important;
+    border-radius: 2px !important;
+    box-shadow: none !important;
+    height: 30px !important;
+    max-width: 572px !important;
+}
+
+#aso_search_form_anchor:focus-within {
+    border-color: #4d90fe !important;
+}
+
+#aso_search_form_anchor input {
+    font: 13px Arial, sans-serif !important;
+    color: #222 !important;
+    padding-left: 8px !important;
+    padding-right: 56px !important;   /* clear the blue button */
+}
+
+/* Hide the pill's built-in magnifier / sliders / mic buttons */
+#aso_search_form_anchor button {
+    display: none !important;
+}
+
+/* ...then resurrect the advanced-search toggle as the little ▾ that
+   sat at the input's right edge in your reference.
+   [FRAGILE — aria-label, English UI] */
+#aso_search_form_anchor button[aria-label*="Advanced" i] {
+    display: flex !important;
+    position: absolute !important;
+    top: 0 !important;
+    right: 50px !important;
+    width: 22px !important;
+    height: 28px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+#aso_search_form_anchor button[aria-label*="Advanced" i] :is(svg, img, span) {
+    display: none !important;
+}
+
+#aso_search_form_anchor button[aria-label*="Advanced" i]::after {
+    content: "▾";
+    color: #777;
+    font-size: 11px;
+}
+
+/* Decorative blue search button, drawn inside the box's right edge so
+   no ancestor overflow:hidden can clip it (Enter still submits; clicks
+   pass through to the input) */
+#aso_search_form_anchor::after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    width: 48px;
+    height: 30px;
+    box-sizing: border-box;
+    background: #4d90fe linear-gradient(#4d90fe, #4787ed)
+        center / 18px 18px no-repeat;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5'%3E%3Ccircle cx='10' cy='10' r='6'/%3E%3Cline x1='14.6' y1='14.6' x2='21' y2='21'/%3E%3C/svg%3E"),
+        linear-gradient(#4d90fe, #4787ed);
+    border: 1px solid #3079ed;
+    border-radius: 0 2px 2px 0;
+    pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* 4. Left nav: red COMPOSE, plain-text labels, red selected item     */
+/* ------------------------------------------------------------------ */
+
+.aeN {
+    background: #fff !important;
+}
+
+/* The red "Gmail ▾" service switcher that headed the nav column in
+   your reference (decorative — the Gmail/Contacts/Tasks dropdown it
+   opened stopped existing a decade ago) */
+.aeN::before {
+    content: "Gmail ▾";
+    display: block;
+    padding: 12px 0 4px 26px;
+    font-family: "Catull", "Book Antiqua", "Palatino Linotype", Georgia, serif;
+    font-size: 20px;
+    color: #dd4b39;
+}
+
+/* The COMPOSE button — your reference has it compact and left-
+   aligned, sized to its text, not full-column */
+.T-I.T-I-KE {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: 28px !important;
+    margin: 6px 0 12px 26px !important;
+    padding: 0 18px !important;
+    background: #d14836 linear-gradient(#dd4b39, #d14836) !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    border-radius: 2px !important;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) !important;
+    color: #fff !important;
+    font-size: 0 !important;   /* mute whatever text Gmail does or doesn't render */
+}
+
+.T-I.T-I-KE:hover {
+    background: #c53727 linear-gradient(#dd4b39, #c53727) !important;
+    border-color: #b0281a !important;
+}
+
+/* Kill whatever Gmail draws inside — your screenshot proved the pencil
+   is a background-image child div, not an <img>/<svg>, which is why it
+   outlived v1.1. Children die wholesale; ::after supplies the label
+   (pseudo-elements aren't matched by *, so it survives). */
+.T-I.T-I-KE > * {
+    display: none !important;
+}
+
+/* v1.5: the pencil that reappeared is Gmail's own ::before pseudo —
+   not a child, so the rule above can't touch it */
+.T-I.T-I-KE::before {
+    content: none !important;
+    display: none !important;
+}
+
+.T-I.T-I-KE::after {
+    content: "COMPOSE";
+    font: bold 12px/1 Arial, Helvetica, sans-serif;
+    letter-spacing: 0.5px;
+    color: #fff;
+}
+
+/* Label rows: no pills, no icons — just text */
+.TO {
+    border-radius: 0 !important;
+    height: 24px !important;
+    box-shadow: none !important;
+}
+
+.TO .qj {                    /* nav item icon. [FRAGILE] If icons
+                                survive, try .TO > div:first-child */
+    display: none !important;
+}
+
+.TO .nU,
+.TO .aio,
+.TN {
+    font-size: 13px !important;
+    color: #222 !important;
+}
+
+.TO:hover {
+    background: #f1f1f1 !important;
+}
+
+/* Selected label = bold red text, no pill (the 2011–2017 signature) */
+.TO.nZ {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.TO.nZ .nU,
+.TO.nZ .aio,
+.TO.nZ .nU *,
+.TO.nZ .bsU {
+    color: #dd4b39 !important;
+    font-weight: bold !important;
+}
+
+/* --- Optional deeper cuts for full period accuracy -----------------
+   Snoozed (2018) and the "Labels +" header (2020s) didn't exist yet.
+   Uncomment to hide — you lose one-click access to snoozed mail:
+.aim:has(a[href$="#snoozed"]) { display: none !important; }
+.aAw { display: none !important; }
+------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------ */
+/* 5. Category tabs: file-folder look, colored top stripe when active */
+/*    [FRAGILE — aria-label prefixes assume English UI]               */
+/* ------------------------------------------------------------------ */
+
+.aAy[role="tab"] {
+    background: #fafafa !important;
+    border: 1px solid #e0e0e0 !important;
+    border-bottom: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.aAy[role="tab"] * {
+    font-family: Arial, sans-serif !important;
+    font-size: 13px !important;
+    color: #666 !important;
+}
+
+.aAy[aria-selected="true"] {
+    background: #fff !important;
+    border-top: 3px solid #db4437 !important;   /* Primary = red */
+}
+
+.aAy[aria-selected="true"] * {
+    color: #222 !important;
+    font-weight: bold !important;
+}
+
+.aAy[aria-selected="true"][aria-label^="Social"]     { border-top-color: #4285f4 !important; }
+.aAy[aria-selected="true"][aria-label^="Promotions"] { border-top-color: #16a765 !important; }
+.aAy[aria-selected="true"][aria-label^="Updates"]    { border-top-color: #f4b400 !important; }
+.aAy[aria-selected="true"][aria-label^="Forums"]     { border-top-color: #9334e6 !important; }
+
+/* ------------------------------------------------------------------ */
+/* 6. Thread list: gray read rows, bold unread, flat hover            */
+/* ------------------------------------------------------------------ */
+
+tr.zA {
+    height: 31px !important;   /* reference density; rows carrying inline
+                                  attachment chips will clip — delete this
+                                  line if that bothers you */
+    border-bottom: 1px solid #e0e0e0 !important;
+}
+
+/* Checked rows go classic pale yellow, exactly as in your reference.
+   v1.5: scoped to the SELECTION checkbox — stars and importance
+   markers are aria-checked toggles too, which is why your important-
+   flagged rows were going yellow. */
+tr.zA:has(div.oZ-jc[aria-checked="true"]),
+tr.zA:has(td:first-child [aria-checked="true"]) {
+    background: #fff8c6 !important;
+}
+
+tr.zA:hover {
+    box-shadow: none !important;
+    border-color: #e0e0e0 !important;
+}
+
+.zA.yO { background: #f2f2f2 !important; }   /* read   */
+.zA.zE { background: #ffffff !important; }   /* unread */
+
+.zA .yW, .zA .yP, .zA .zF, .zA .bog, .zA .y2, .zA .xW span {
+    font-size: 13px !important;
+}
+
+.zF,                          /* unread sender  */
+.zA.zE .bog,                  /* unread subject */
+.zA.zE .xW span {             /* unread date    */
+    font-weight: bold !important;
+    color: #222 !important;
+}
+
+.y2 {
+    color: #666 !important;   /* snippet gray */
+}
+
+/* 2015 had no per-row hover action icons — actions lived in the
+   toolbar. (Settings ▸ General ▸ Hover actions ▸ Disable does this
+   natively; CSS belt-and-suspenders:) */
+ul.bqY, li.bqX {
+    display: none !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* 7. Buttons everywhere: the Kennedy gray gradient                   */
+/* ------------------------------------------------------------------ */
+
+.T-I.J-J5-Ji:not(.T-I-KE):not(.T-I-atl) {
+    background: #f5f5f5 linear-gradient(#f5f5f5, #f1f1f1) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 2px !important;
+    box-shadow: none !important;
+    color: #444 !important;
+}
+
+.T-I.J-J5-Ji:not(.T-I-KE):not(.T-I-atl):hover {
+    border-color: #c6c6c6 !important;
+    color: #222 !important;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* 8. Conversation view                                               */
+/* ------------------------------------------------------------------ */
+
+.hP {                          /* subject line */
+    font: normal 20px Arial, sans-serif !important;
+    color: #222 !important;
+}
+
+.gD {                          /* sender name  */
+    font-weight: bold !important;
+    font-size: 13px !important;
+    color: #222 !important;
+}
+
+.go {                          /* <address>    */
+    color: #777 !important;
+    font-size: 12px !important;
+}
+
+/* Send button: Kennedy blue (.aoO / .T-I-atl, stable since 2012) */
+.T-I-atl,
+.T-I.aoO {
+    background: #4d90fe linear-gradient(#4d90fe, #4787ed) !important;
+    border: 1px solid #3079ed !important;
+    border-radius: 2px !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    box-shadow: none !important;
+}
+
+.T-I-atl:hover,
+.T-I.aoO:hover {
+    background: #357ae8 linear-gradient(#4d90fe, #357ae8) !important;
+    border-color: #2f5bb7 !important;
+}
+
+/* Bottom-of-thread Reply / Forward pills → Kennedy gray buttons
+   (.ams has meant exactly these buttons since the GWT days) */
+.ams {
+    display: inline-flex !important;
+    align-items: center !important;
+    height: 27px !important;
+    padding: 0 12px !important;
+    background: #f5f5f5 linear-gradient(#f5f5f5, #f1f1f1) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 2px !important;
+    box-shadow: none !important;
+    color: #444 !important;
+    font: bold 13px Arial, sans-serif !important;
+}
+
+.ams:hover {
+    border-color: #c6c6c6 !important;
+    color: #222 !important;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Emoji reactions arrived in 2023 — gone. [FRAGILE — English UI] */
+[aria-label*="reaction" i],
+[data-tooltip*="reaction" i],
+[title*="reaction" i] {
+    display: none !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* 9. Amputate the 2020s: right companion rail                        */
+/*    (Chat/Meet rails: turn off in Settings ▸ Chat and Meet — that's */
+/*    the authentic removal, not a CSS hide)                          */
+/* ------------------------------------------------------------------ */
+
+.brC-aT5-aOt-Jw {
+    display: none !important;
+}
+
+/* ...and the stray "show side panel" chevron it leaves on the right
+   edge — another 2026-only artifact */
+[aria-label*="side panel" i],
+[data-tooltip*="side panel" i] {
+    display: none !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* 10. OPTIONAL: 2013-era dark compose title bar                      */
+/*     Gmail reshuffles compose-window classes more than the rest of  */
+/*     the app, so this ships commented out. DevTools the strip that  */
+/*     says "New Message", grab its class, drop it in:                */
+/*                                                                    */
+/*  .YOUR-TITLEBAR-CLASS {                                            */
+/*      background: #404040 !important;                               */
+/*      border-radius: 2px 2px 0 0 !important;                        */
+/*  }                                                                 */
+/*  .YOUR-TITLEBAR-CLASS * { color: #fff !important; }                */
+/* ------------------------------------------------------------------ */
+
+}
