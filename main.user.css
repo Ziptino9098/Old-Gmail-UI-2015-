@@ -1,12 +1,20 @@
-/* ==UserStyle==
-@name           Gmail 2015 — Kennedy-era restoration
-@namespace      local.burke
-@version        1.6.0
-@description    Rolls modern Gmail back to its ~2015 chrome: red COMPOSE, gray gradient buttons, Arial 13px, square corners, #f2f2f2 read rows, blue search button, red selected labels, Catull-style red wordmark.
-@author         Burke
-==/UserStyle== */
-
-@-moz-document domain("mail.google.com") {
+/* ------------------------------------------------------------------ */
+/* GEAR SEAT — the only two numbers you should ever need to touch.     */
+/* The gear lives in the header and the toolbar is a sibling, so       */
+/* position:fixed is the only way to cross containers — which means    */
+/* viewport math that shifts with zoom, display scaling, and browser   */
+/* chrome. If the gear isn't level with the pagination arrows, nudge   */
+/* --gear-top a few px and save; Stylus re-renders live, so you can    */
+/* dial it in in about four seconds. (Firefox override further down.)  */
+/* ------------------------------------------------------------------ */
+:root {
+    --gear-top: 76px;
+    --gear-right: 14px;
+    /* Quota bar fill. Red as requested; the period-correct Kennedy
+       fill was #4285f4 (blue) — red was Gmail's nearly-full warning
+       state. Swap this one value to switch. */
+    --quota-fill: #d14836;
+}
 
 /* =========================================================================
    NOTES ON SELECTOR STABILITY
@@ -132,14 +140,14 @@ header [aria-label="Settings"]:not(:has([aria-label="Settings"])),
 #gb [aria-label="Settings"]:not(:has([aria-label="Settings"])),
 [data-tooltip="Settings"]:not(:has([aria-label="Settings"])) {
     position: fixed !important;
-    top: 62px !important;
-    right: 8px !important;
+    top: var(--gear-top) !important;
+    right: var(--gear-right) !important;
     z-index: 999 !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 46px !important;
-    height: 27px !important;
+    width: 40px !important;
+    height: 24px !important;   /* matches the density button beside it */
     padding: 0 !important;
     overflow: hidden !important;
     background: #f5f5f5 linear-gradient(#f5f5f5, #f1f1f1) !important;
@@ -578,4 +586,48 @@ ul.bqY, li.bqX {
 /*  .YOUR-TITLEBAR-CLASS * { color: #fff !important; }                */
 /* ------------------------------------------------------------------ */
 
+
+/* ------------------------------------------------------------------ */
+/* v1.7 — per-engine gear seat. position:fixed is viewport-tuned, and  */
+/* your two daily drivers disagree by ~9px: Chromium/Windows gets the  */
+/* base values in section 2; Firefox — detected via a property only    */
+/* Gecko admits to — keeps the seat that was already correct on the    */
+/* Mac. Nudge either independently if zoom/scaling differs.            */
+/* ------------------------------------------------------------------ */
+
+@supports (-moz-appearance: none) {
+    :root {
+        --gear-top: 62px;
+        --gear-right: 8px;
+    }
+}
+
+
+/* ------------------------------------------------------------------ */
+/* v1.8 — the storage quota bar: thin, square, 2015 proportions.       */
+/* [role="progressbar"] is the sturdy anchor (it survives class churn) */
+/* with legacy Gmail quota ids as backup. Fill color is --quota-fill.  */
+/* ------------------------------------------------------------------ */
+
+[role="progressbar"],
+#qu .pf, .aBB, .bsU .pf {
+    height: 5px !important;
+    border-radius: 0 !important;
+    background-color: #e0e0e0 !important;   /* the gray track */
+    overflow: hidden !important;
+}
+
+[role="progressbar"] > *,
+#qu .pf > *, .aBB > * {
+    height: 100% !important;
+    border-radius: 0 !important;
+    background-color: var(--quota-fill) !important;
+    background-image: none !important;
+}
+
+/* the Google One pop-out arrow beside the text is a 2020s addition */
+#qu a[href*="one.google.com"] svg,
+#qu a[href*="storage" i] svg,
+[aria-label*="storage" i] svg {
+    display: none !important;
 }
