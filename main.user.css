@@ -1,3 +1,24 @@
+/* ==UserStyle==
+@name           Gmail 2015 — Kennedy-era restoration
+@namespace      local.burke
+@version        1.9.0
+@description    Rolls modern Gmail back to its ~2015 chrome: red COMPOSE, gray gradient buttons, Arial 13px, square corners, #f2f2f2 read rows, blue search button, red selected labels, Catull-style red wordmark.
+@author         Burke
+@homepageURL    https://gist.github.com/
+==/UserStyle== */
+
+/* SYNC FIX — to end version drift between your machines: put this file
+   in a GitHub Gist, then add these two lines to the metadata block
+   above with the gist's RAW url (must end in .user.css — name the gist
+   file gmail-2015.user.css):
+     @updateURL      https://gist.githubusercontent.com/<you>/<id>/raw/gmail-2015.user.css
+     @downloadURL    https://gist.githubusercontent.com/<you>/<id>/raw/gmail-2015.user.css
+   Install on BOTH machines from that raw url (open it — Stylus offers
+   to install). From then on: edit the gist, bump @version, and Stylus's
+   "Check for updates" pulls it everywhere. No more self-mail drift. */
+
+@-moz-document domain("mail.google.com") {
+
 /* ------------------------------------------------------------------ */
 /* GEAR SEAT — the only two numbers you should ever need to touch.     */
 /* The gear lives in the header and the toolbar is a sibling, so       */
@@ -62,22 +83,30 @@ header[role="banner"] {
     display: none !important;
 }
 
-/* ... and draw the four-color serif "Google" in its place — your
-   reference shows the One Google bar layout: Google logo top-left,
-   with the red "Gmail ▾" service switcher moved down into the nav
-   column (added below via .aeN::before). Inline SVG data-URI so
-   nothing depends on Google still hosting 2013 assets. Alternatives:
-     - the real 2013 asset, if it still resolves and Gmail's CSP
-       allows it — swap the background line for:
-       background: url("https://www.google.com/images/srpr/logo11w.png") left center / contain no-repeat;
-     - or your own capture as a data: URI, same pattern. */
+/* v1.9: SANS-SERIF wordmark — Google retired the serif Catull-style
+   logo on September 1, 2015, replacing it with the flat geometric
+   sans-serif wordmark (the one still in use today, later paired with
+   the four-color "G"). Colors are unchanged, only the typeface moved
+   from serif to sans — so if your target date is on/after Sep 1 2015,
+   this is the accurate one; the old serif version is only correct for
+   Gmail before that date. Product Sans isn't a system font most
+   machines have, so this falls back to Arial, which approximates the
+   geometric sans reasonably well absent the real font. Inline SVG
+   data-URI so nothing depends on Google still hosting old assets.
+   Alternatives:
+     - the real 2013 serif asset (pre-Sep-2015 only), if it still
+       resolves and Gmail's CSP allows it — swap the background line
+       for: background: url("https://www.google.com/images/srpr/logo11w.png") left center / contain no-repeat;
+     - your own capture of the real Sep-2015+ sans asset, or a licensed
+       Product Sans font file, as a data: URI, same pattern — would be
+       more accurate than the Arial fallback used here. */
 #gb a:has(> img[alt="Gmail"])::after,
 #gb a:has(img[src*="logo_gmail"])::after {
     content: "";
     display: inline-block;
     width: 92px;
     height: 32px;
-    background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='92' height='32'%3E%3Ctext x='0' y='25' font-family='Georgia,serif' font-size='27' letter-spacing='-1.5'%3E%3Ctspan fill='%234285f4'%3EG%3C/tspan%3E%3Ctspan fill='%23ea4335'%3Eo%3C/tspan%3E%3Ctspan fill='%23fbbc05'%3Eo%3C/tspan%3E%3Ctspan fill='%234285f4'%3Eg%3C/tspan%3E%3Ctspan fill='%2334a853'%3El%3C/tspan%3E%3Ctspan fill='%23ea4335'%3Ee%3C/tspan%3E%3C/text%3E%3C/svg%3E") left center / contain no-repeat;
+    background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='92' height='32'%3E%3Ctext x='0' y='24' font-family='Product Sans,Google Sans,Arial,sans-serif' font-weight='500' font-size='25' letter-spacing='-0.5'%3E%3Ctspan fill='%234285f4'%3EG%3C/tspan%3E%3Ctspan fill='%23ea4335'%3Eo%3C/tspan%3E%3Ctspan fill='%23fbbc05'%3Eo%3C/tspan%3E%3Ctspan fill='%234285f4'%3Eg%3C/tspan%3E%3Ctspan fill='%2334a853'%3El%3C/tspan%3E%3Ctspan fill='%23ea4335'%3Ee%3C/tspan%3E%3C/text%3E%3C/svg%3E") left center / contain no-repeat;
 }
 
 /* 2015 had no hamburger — the nav was always open. Hiding it also
@@ -289,12 +318,15 @@ header [aria-label="Settings"]:not(:has([aria-label="Settings"]))::after,
 
 /* The red "Gmail ▾" service switcher that headed the nav column in
    your reference (decorative — the Gmail/Contacts/Tasks dropdown it
-   opened stopped existing a decade ago) */
+   opened stopped existing a decade ago). v1.9: sans-serif to match
+   the Sept 1 2015 wordmark change — same red, same layout, only the
+   typeface moved off Catull to match the header logo above. */
 .aeN::before {
     content: "Gmail ▾";
     display: block;
     padding: 12px 0 4px 26px;
-    font-family: "Catull", "Book Antiqua", "Palatino Linotype", Georgia, serif;
+    font-family: "Product Sans", "Google Sans", Arial, sans-serif;
+    font-weight: 500;
     font-size: 20px;
     color: #dd4b39;
 }
@@ -630,4 +662,6 @@ ul.bqY, li.bqX {
 #qu a[href*="storage" i] svg,
 [aria-label*="storage" i] svg {
     display: none !important;
+}
+
 }
