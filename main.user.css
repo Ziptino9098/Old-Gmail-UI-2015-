@@ -1,21 +1,12 @@
 /* ==UserStyle==
 @name           Gmail 2015 — Kennedy-era restoration
-@namespace      local.burke
+@namespace      lgithub
 @version        1.9.0
 @description    Rolls modern Gmail back to its ~2015 chrome: red COMPOSE, gray gradient buttons, Arial 13px, square corners, #f2f2f2 read rows, blue search button, red selected labels, Catull-style red wordmark.
-@author         Burke
+@author         Ziptino9098
 @homepageURL    https://gist.github.com/
 ==/UserStyle== */
 
-/* SYNC FIX — to end version drift between your machines: put this file
-   in a GitHub Gist, then add these two lines to the metadata block
-   above with the gist's RAW url (must end in .user.css — name the gist
-   file gmail-2015.user.css):
-     @updateURL      https://gist.githubusercontent.com/<you>/<id>/raw/gmail-2015.user.css
-     @downloadURL    https://gist.githubusercontent.com/<you>/<id>/raw/gmail-2015.user.css
-   Install on BOTH machines from that raw url (open it — Stylus offers
-   to install). From then on: edit the gist, bump @version, and Stylus's
-   "Check for updates" pulls it everywhere. No more self-mail drift. */
 
 @-moz-document domain("mail.google.com") {
 
